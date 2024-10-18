@@ -3,7 +3,7 @@ from PIL import Image, ImageTk
 from tkinter import messagebox as mb
 
 
-def asc_url(cwd: str, path_photo: str, ) -> str:
+def asc_url(path_photo: str, ) -> str:
     root2 = Tk()
     root2.title("Укажите ссылки на фото")
     canvas = Canvas(root2)

@@ -2,17 +2,19 @@ from re import search, findall
 from random import choice
 from pars_tg import CopyContent
 from UrlPhoto import asc_url
+from cab_data import asc_cab_data
 from avitodata import set_id, set_address
 import pandas as pd
 from json import load
 import asyncio
 from os import getcwd, scandir, remove
+
 # import uvloop
 
 """
     class LoadData
         Запускает парсер телеграмма и загружает данные в таблицу.
-    
+
     При создании принимает 2 аргумента:
         choose - имя телеграмм канала: straight tables, comp armchair, cabinet, closet, director office, corner tables,
             chairs.
@@ -44,17 +46,16 @@ class LoadData:
     Работаем уже 6 лет, развиваясь и улучшая сервисный центр
     Можем укомплектовать 100-200 рабочих мест.
     """, """Для того, чтобы получить больше предложений и подобрать мебель под ваши личные нужды напишите или позвоните нам---->
-                 ➕ Адрес: Склад в г. Одинцово улица Старое Яскино 75ст2. Ориентир ворота с вывеской Офис Комфорт
-                 ➕ При поиске нас в навигаторе наберите – 
-                 Офис комфорт Одинцово 
-                 ➕ Наш телеграмм канал – office comfort es
-                 🕒 График: Часы работы склада с 10 до 19, Выходной Вс. 
-                 -------------------------------------------------------------------
-                 Oфис Комфорт — это большой склад офисной мебели, после закрытия больших организаций, в городе Одинцово М.О.
-                 На нашем складе вы найдете мебель на любой вкус. У много как дешевой бу мебели, так и мебель известных производителей представительного класса. 
-                 Работаем уже 6 лет, развиваясь и улучшая сервисный центр
-                 Можем укомплектовать 100-200 рабочих мест.
-                 """]
+            ➕ Адрес: Склад в г. Одинцово улица Старое Яскино 75ст2. Ориентир ворота с вывеской Офис Комфорт
+            ➕ При поиске нас в навигаторе наберите – 
+            Офис комфорт Одинцово 
+            ➕ Наш телеграмм канал – office comfort es
+            🕒 График: Часы работы склада с 10 до 19, Выходной Вс. 
+            -------------------------------------------------------------------
+            Oфис Комфорт — это большой склад офисной мебели, после закрытия больших организаций, в городе Одинцово М.О.
+            На нашем складе вы найдете мебель на любой вкус. У много как дешевой бу мебели, так и мебель известных производителей представительного класса. 
+            Работаем уже 6 лет, развиваясь и улучшая сервисный центр
+            Можем укомплектовать 100-200 рабочих мест."""]
     add_text = {
         "comp armchair": """
     В наличии более 150 разных компьютерных кресел бу для работы дома и в офисе.
@@ -112,29 +113,17 @@ class LoadData:
                }
     _tables_field = {
         'main': [['VideoURL', 'Category', 'AdType', 'Condition', 'Availability'],
-                 ['https://youtu.be/ycYx204IpKc?si=5z8-v1fOQP2SdfR_', 'Мебель и интерьер',
-                  'Товар приобретен на продажу',
+                 ['https://youtu.be/ycYx204IpKc?si=5z8-v1fOQP2SdfR_', 'Мебель и интерьер', 'Товар приобретен на продажу',
                   'Б/у', 'В наличии']],
-        'cabinet': [['GoodsType', 'GoodsSubType', 'DresserType', 'Material', 'FurnitureAdditions'],
-                    ['Шкафы, комоды и стеллажи', 'Комоды и тумбы', 'Тумба', 'ДСП | Металл', 'Колесики | Ящики']],
-        'chairs': [['GoodsType', 'GoodsSubType', 'SeatMaterial', 'BaseMaterial', 'FurnitureAdditions'],
-                   ['Столы и стулья', 'Стулья', 'Ткань | Искусственная кожа', 'Дерево | Металл',
-                    'Подлокотники | Колёсики | Мягкое сидение | Мягкая спинка']],
-        'closet': [['GoodsType', 'GoodsSubType', 'CabinetType', 'Material', 'Purpose'],
-                   ['Шкафы, комоды и стеллажи', 'Шкафы и буфеты', "Шкаф", "МДФ | Металл | Пластик | ДСП",
-                    'Кабинет | Офис | Балкон | Прихожая | Спальня']],
-        'comp armchair': [
-            ['GoodsType', 'GoodsSubType', 'DeskChairType', 'ComputerChairType', 'UpholsteryMaterial',
-             'FurnitureAdditions'],
-            ['Компьютерные столы и кресла', 'Кресла и стулья', 'Компьютерные кресла', 'Компьютерное',
-             'Искусственная кожа | Ткань | Кожа | Замша | Сетка | Дерево',
-             'Подлокотники | Подголовник | Механизм качания | Регулировка наклона спинки | Регулировка подлокотников | Регулировка глубины сиденья | Поясничный упор']],
-        'tables': [['GoodsType', 'GoodsSubType', 'TableType', 'FurnitureShape', 'FoldingMechanism', 'TabletopMaterial',
-                    'BaseMaterial', 'FurnitureAdditions', 'Purpose'],
-                   ['Столы и стулья', 'Столы', 'Письменный | Кухонный | Барный | Журнальный | Другой',
-                    'Прямоугольный | Квадратный | Круглый | Полукруглый | Угловой', 'Нет',
-                    'ДСП | ЛДСП | Стекло | Дерево', 'ДСП | Дерево | Металл', 'Тумба',
-                    'Бар/кафе | Кабинет | Кухня']]
+        'cabinet': [['GoodsType', 'GoodsSubType', 'DresserType'],
+                    ['Шкафы, комоды и стеллажи', 'Комоды и тумбы', 'Тумба']],
+        'chairs': [['GoodsType', 'GoodsSubType'], ['Столы и стулья', 'Стулья']],
+
+        'closet': [['GoodsType', 'GoodsSubType', 'CabinetType'],['Шкафы, комоды и стеллажи', 'Шкафы и буфеты', "Шкаф"]],
+
+        'comp armchair': [['GoodsType', 'GoodsSubType', 'DeskChairType', 'ComputerChairType'],
+            ['Компьютерные столы и кресла', 'Кресла и стулья', 'Компьютерные кресла', 'Компьютерное']],
+        'tables': [['GoodsType', 'GoodsSubType', 'FoldingMechanism'], ['Столы и стулья', 'Столы', 'Нет']]
     }
     __content = CopyContent()
 
@@ -142,7 +131,7 @@ class LoadData:
         self.choose = choose
 
     @classmethod
-    def __open_xl(cls, name_table: str) -> tuple[pd.DataFrame, str]:
+    def __open_xl(cls, name_table: str) -> pd.DataFrame:
         """
             Открытие таблицы и чтение с нее данных в ДатаФрейм.
 
@@ -154,14 +143,9 @@ class LoadData:
                     для Директорской, угловых и прямых столов - tables
                     для остальных self.choose
         """
-        match name_table:
-            case "director office" | "corner tables" | "straight tables":
-                xl = pd.read_excel(f"{cls.__cwd}/data_xl/tables.xlsx")
-                data_f, name = pd.DataFrame(xl), 'tables'
-            case _:
-                xl = pd.read_excel(f"{cls.__cwd}/data_xl/{name_table}.xlsx")
-                data_f, name = pd.DataFrame(xl), name_table
-        return data_f, name
+
+
+        return data_f
 
     @classmethod
     def __read_js(cls):
@@ -176,17 +160,15 @@ class LoadData:
             return "This file doesn`t exist"
 
     @classmethod
-    def __load_size_data(cls, frame: pd.DataFrame, pars: dict, key: list, ind: int) -> pd.DataFrame:
-        """
-            Загружает данные размеров и цвета в таблицы cabinet и closet
-            Принимает:
-                frame - ДатаФрейм, таблица
-                pars - словарь с captions, текст-описание
-                key - ключи к pars
-                ind - индекс, строчка в таблице на которую идет запись данных
-            Возвращает:
-                ДатаФрейм
-        """
+    def __load_cabinet_data(cls, cap, photo, field_add) -> pd.DataFrame:
+        width, depth, height = findall(r'(\d{2,3})[хx/\\](\d{2,3})[хx/\\](\d{2,3})', cap)[0]
+        data_cab = asc_cab_data(photo, field_add)
+        field_add.extend(('Width', 'Height', 'Depth'))
+
+        return field_add
+
+    @classmethod
+    def __load_chairs_data(cls, frame: pd.DataFrame, pars: dict, key: list, ind: int) -> pd.DataFrame:
         index = ind
 
         for i in key:
@@ -197,17 +179,18 @@ class LoadData:
         return frame
 
     @classmethod
-    def __load_armchair_size_data(cls, frame: pd.DataFrame, pars: dict, key: list, ind: int) -> pd.DataFrame:
-        """
-        Загружает данные размеров и цвета в таблицу comp armchair
-        Принимает:
-            frame - ДатаФрейм, таблица
-            pars - словарь с captions, текст-описание
-            key - ключи к pars
-            ind - индекс, строчка в таблице на которую идет запись данных
-        Возвращает:
-            ДатаФрейм
-        """
+    def __load_closet_data(cls, frame: pd.DataFrame, pars: dict, key: list, ind: int) -> pd.DataFrame:
+        index = ind
+
+        for i in key:
+            width, depth, height = findall(r'(\d{2,3})[хx/\\](\d{2,3})[хx/\\](\d{2,3})', pars[i])[0]
+            frame.loc[index, ['Width', 'Height', 'Depth']] = [int(width), int(height), int(depth)]
+            index += 1
+
+        return frame
+
+    @classmethod
+    def __load_armchair_data(cls, frame: pd.DataFrame, pars: dict, key: list, ind: int) -> pd.DataFrame:
         index = ind
         for i in key:
             try:
@@ -224,17 +207,7 @@ class LoadData:
         return frame
 
     @classmethod
-    def __load_tables_size(cls, frame: pd.DataFrame, pars: dict, key: list, ind: int) -> pd.DataFrame:
-        """
-        Загружает данные размеров и цвета в таблицу comp armchair
-        Принимает:
-            frame - ДатаФрейм, таблица
-            pars - словарь с captions, текст-описание
-            key - ключи к pars
-            ind - индекс, строчка в таблице на которую идет запись данных
-        Возвращает:
-            ДатаФрейм
-        """
+    def __load_tables_data(cls, frame: pd.DataFrame, pars: dict, key: list, ind: int) -> pd.DataFrame:
         index = ind
         for i in key:
             length, width, height = findall(r'(\d{2,3})[хx/\\](\d{2,3})[хx/\\](\d{2,3})', pars[i])[0]
@@ -243,60 +216,6 @@ class LoadData:
 
         return frame
 
-
-    @classmethod
-    def __end_program(cls) -> None:
-        """
-            Завершение программы - удаление скачаных фото
-        """
-        pat = f"{cls.__cwd}/data_xl/photo"
-        files = scandir(pat)
-        for i in files:
-            remove(i)
-
-    @classmethod
-    def __load_standard_data(cls, name: str) -> tuple[pd.DataFrame, int, str, list]:
-        """
-            Загрузка данных в таблицу и запуск функций для записи размеров и цвета
-            Принимает:
-                name - self.choose
-            Возвращает:
-                fr - dataFrame
-                ind - индекс строки с которой начинается запись
-                table - название таблицы
-                key - ключи от captions
-        """
-        pars_data = cls.__read_js()
-        fr, table = cls.__open_xl(name)
-        key = list(pars_data.keys())
-        ind = len(fr.index)
-        field = ['Title', 'Description', 'Price', 'ImageUrls', 'Id']
-        field.extend(cls._tables_field['main'][0])
-        field.extend(cls._tables_field[table][0])
-
-        for i in key:
-            title = search(r"(.*)", pars_data[i]).group()
-            description = pars_data[i] + "\n" + (
-                cls.add_text[name] if name in cls.add_text else cls.add_text['tables']) + "\n" + choice(cls.main_text)
-            price = findall(r"Цена[: ]?([\d ]*)", pars_data[i]) or ['']
-            art = findall(r"[Аa]рт(?:икул)?[. (]*([\d]*)", pars_data[i]) or [1]
-            image_url = asc_url(cls.__cwd, i)
-
-            lst = [title, description, int(price[0].replace(' ', '')), image_url, int(art[0])]
-            lst.extend(cls._tables_field['main'][1])
-            lst.extend(cls._tables_field[table][1])
-
-            fr.loc[len(fr.index), field] = lst
-
-        match table:
-            case "cabinet" | "closet":
-                cls.__load_size_data(fr, pars_data, key, ind)
-            case "tables":
-                cls.__load_tables_size(fr, pars_data, key, ind)
-            case "comp armchair":
-                cls.__load_armchair_size_data(fr, pars_data, key, ind)
-        return fr, ind, table, key
-
     @classmethod
     def __load_data_xl(cls, name: str) -> None:
         """
@@ -304,21 +223,51 @@ class LoadData:
             Принимает
                 name - self.choose
         """
-        frame, index, table, key = cls.__load_standard_data(name)
-        writer = pd.ExcelWriter(f"{cls.__cwd}/data_xl/{table}.xlsx", engine="xlsxwriter")
-
-        frame.to_excel(writer, index=False)
-        worksheet = writer.sheets['Sheet1']
+        pars_data = cls.__read_js()
+        xl = pd.read_excel(f"{cls.__cwd}/data_xl/{name}.xlsx")
+        fr = pd.DataFrame(xl)
+        key = list(pars_data.keys())
+        ind = len(fr.index)
+        field = ['Title', 'Description', 'Price', 'ImageUrls', 'Id']
+        field.extend(cls._tables_field['main'][0])
+        field.extend(cls._tables_field[name][0])
 
         for i in key:
-            worksheet.insert_image("P" + str(index + 2), f'{cls.__cwd}/data_xl/photo/{i}.jpeg',
-                                   {"x_scale": 0.1, "y_scale": 0.1})
-            index += 1
+            title = search(r"(.*)", pars_data[i]).group()
+            description = pars_data[i] + "\n" + (
+                cls.add_text[name] if name in cls.add_text else cls.add_text['tables']) + "\n" + choice(cls.main_text)
+            price = findall(r"Цена[: ]?([\d ]*)", pars_data[i]) or ['']
+            art = findall(r"[Аa]рт(?:икул)?[. (]*([\d]*)", pars_data[i]) or [1]
+            image_url = asc_url(i)
 
-        writer._save()
+            field_add, data_add = None, None
+            if name in ("straight tables", "corner tables", "director office"):
+                field_add = ['TableType', 'FurnitureShape', 'TabletopMaterial', 'BaseMaterial', 'FurnitureAdditions',
+                             'Purpose', "Color"]
+                field_add, data_add = cls.__load_tables_data(pars_data[i], i, field_add)
+            elif name == 'comp armchair':
+                field_add = ['UpholsteryMaterial', 'FurnitureAdditions']
+                field_add, data_add = cls.__load_armchair_data(pars_data[i], i, field_add)
+            elif name == "closet":
+                field_add = ['Material', 'Purpose', "Color"]
+                field_add, data_add = cls.__load_closet_data(pars_data[i], i, field_add)
+            elif name == "chairs":
+                field_add = ['SeatMaterial', 'BaseMaterial', 'FurnitureAdditions', "Color"]
+                field_add, data_add = cls.__load_chairs_data(pars_data[i], i, field_add)
+            else:
+                field_add = ['Material', 'FurnitureAdditions', "Color"]
+                data_add = cls.__load_cabinet_data(pars_data[i], i, field_add)
+
+            lst = [title, description, int(price[0].replace(' ', '')), image_url, int(art[0])]
+            lst.extend(cls._tables_field['main'][1])
+            lst.extend(cls._tables_field[name][1])
+
+            fr.loc[len(fr.index), field] = lst
+
+        fr.to_excel(name + '.xlsx', index=False)
 
     def table_for_avito(self):
-        fr, table = self.__open_xl(self.choose)
+        fr = self.__open_xl(self.choose)
         index = fr["Id"].isnull().sum()
         start_id = len(fr.index) - index
         ides = set_id(index)
@@ -329,6 +278,16 @@ class LoadData:
             start_id += 1
 
         fr.to_excel(file, index=False)
+
+    @classmethod
+    def __end_program(cls) -> None:
+        """
+            Завершение программы - удаление скачаных фото
+        """
+        pat = f"{cls.__cwd}/data_xl/photo"
+        files = scandir(pat)
+        for i in files:
+            remove(i)
 
     def start_pars(self, count_mass: int):
         """
