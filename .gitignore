@@ -1,3 +1,5 @@
 .idea
 __pycache__
 key.py
+make_xl/my_session.session
+make_xl/my_session.session-journal

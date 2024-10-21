@@ -1,5 +1,5 @@
 from tkinter import *
-from LoadToExcel import LoadData
+from WriteToExcel import LoadData
 from tkinter import font
 from tkinter import messagebox as mb
 from functools import wraps

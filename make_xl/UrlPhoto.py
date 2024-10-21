@@ -26,7 +26,7 @@ def asc_url(path_photo: str, ) -> str:
                 urls.append(i.get())
         if len(urls) != len(set(urls)):
             urls.clear()
-            mb.showerror("Вы указали повторяющиеся ссылки!\nЗамените их.")
+            mb.showerror("Ошибка", "Вы указали повторяющиеся ссылки!\nЗамените их.")
         else:
             nonlocal union_url
             root2.destroy()
@@ -41,4 +41,4 @@ def asc_url(path_photo: str, ) -> str:
 
 
 if __name__ == "__main__":
-    asc_url("None", '1390')
+    asc_url('439')
