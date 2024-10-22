@@ -2,7 +2,7 @@ from re import search, findall
 from random import choice
 from pars_tg import CopyContent
 from UrlPhoto import asc_url
-from cab_data import asc_cab_data
+from add_data import AddData
 from avitodata import set_id, set_address
 import pandas as pd
 from json import load
@@ -93,24 +93,6 @@ class LoadData:
     так же есть стулья для кухни разных цветов, для любого интерьера. 
     Самая низкая цена стула 799
     """}
-    _colors = {"Бежевый": "Бежевый",
-               "Белый": "Белый",
-               "Бирюзовый": "Бирюзовый",
-               "Голубой": "Голубой",
-               "Жёлтый": "Жёлтый",
-               "Зелёный": "Зелёный",
-               "Коричневый": "Коричневый",
-               "Красный": "Красный",
-               "Оранжевый": "Оранжевый",
-               "Розовый": "Розовый",
-               "Серебристый": "Серебристый",
-               "Серый": "Серый",
-               "Синий": "Синий",
-               "Фиолетовый": "Фиолетовый",
-               "Чёрный": "Чёрный",
-               "Разноцветный": "Разноцветный",
-               "Другой": "Другой",
-               }
     _tables_field = {
         'cabinet': [['GoodsType', 'GoodsSubType', 'DresserType', 'Material', 'FurnitureAdditions', "Color"],
                     ['Шкафы, комоды и стеллажи', 'Комоды и тумбы', 'Тумба']],
@@ -121,7 +103,7 @@ class LoadData:
                    ['Шкафы, комоды и стеллажи', 'Шкафы и буфеты', "Шкаф"]],
 
         'comp armchair': [['GoodsType', 'GoodsSubType', 'DeskChairType', 'ComputerChairType', 'UpholsteryMaterial',
-                           'FurnitureAdditions'],
+                           'FurnitureAdditions', "Color"],
                           ['Компьютерные столы и кресла', 'Кресла и стулья', 'Компьютерные кресла', 'Компьютерное']],
         'straight tables': [['GoodsType', 'GoodsSubType', 'FoldingMechanism', 'TableType', 'FurnitureShape',
                              'TabletopMaterial', 'BaseMaterial', 'FurnitureAdditions', 'Purpose', "Color"],
@@ -135,9 +117,6 @@ class LoadData:
 
     }
 
-    _add_field = {
-
-    }
     __content = CopyContent()
 
     def __init__(self, choose: str):
@@ -172,49 +151,6 @@ class LoadData:
             return "This file doesn`t exist"
 
     @classmethod
-    def __load_cabinet_data(cls, cap, photo, field_add) -> list[str | int]:
-        size = map(int, findall(r'(\d{2,3})[хx/\\](\d{2,3})[хx/\\](\d{2,3})', cap)[0])
-        data_cab = asc_cab_data(photo, field_add)
-        data_cab.extend(size)
-
-        return data_cab
-
-    @classmethod
-    def __load_chairs_data(cls, cap, photo, field_add) -> pd.DataFrame:
-        pass
-
-    @classmethod
-    def __load_closet_data(cls, cap, photo, field_add) -> pd.DataFrame:
-        # width, depth, height = findall(r'(\d{2,3})[хx/\\](\d{2,3})[хx/\\](\d{2,3})', pars[i])[0]
-        pass
-
-    @classmethod
-    def __load_armchair_data(cls, cap, photo, field_add) -> pd.DataFrame:
-        # index = ind
-        # for i in key:
-        #     try:
-        #         sizes = findall(r'(\d{2,3})[хx/\\](\d{2,3})', pars[i])
-        #         width, depth = sizes[0]
-        #         maxh, minh = sizes[1]
-        #         frame.loc[index, ['Width', 'Depth', 'MaxHeight', 'MinHeight']] = [width, depth, maxh, minh]
-        #     except IndexError:
-        #         pass
-        #     else:
-        #         width, depth, maxh, minh = 48, 50, 45, 57
-        #         frame.loc[index, ['Width', 'Depth', 'MaxHeight', 'MinHeight']] = [width, depth, maxh, minh]
-
-        pass
-
-    @classmethod
-    def __load_tables_data(cls, cap, photo, field_add) -> pd.DataFrame:
-        # index = ind
-        # for i in key:
-        #     length, width, height = findall(r'(\d{2,3})[хx/\\](\d{2,3})[хx/\\](\d{2,3})', pars[i])[0]
-        #     frame.loc[index, ['Width', 'Height', 'Length']] = [int(width), int(height), int(length)]
-        #     index += 1
-        pass
-
-    @classmethod
     def __load_data_xl(cls, name: str) -> None:
         """
             Запускает функцию загрузки данных и добавляет фото в таблицу
@@ -225,7 +161,6 @@ class LoadData:
         xl = pd.read_excel(f"{cls.__cwd}/data_xl/{name}.xlsx")
         fr = pd.DataFrame(xl)
         key = list(pars_data.keys())
-        ind = len(fr.index)
         field = ['Title', 'Description', 'Price', 'ImageUrls', 'Id', 'VideoURL', 'Category', 'AdType', 'Condition',
                  'Availability']
         field.extend(cls._tables_field[name][0])
@@ -240,24 +175,29 @@ class LoadData:
 
             data_add = None
             if name in ("straight tables", "corner tables", "director office"):
-                field_add = ['TableType', 'FurnitureShape', 'TabletopMaterial', 'BaseMaterial', 'FurnitureAdditions',
-                             'Purpose', "Color"]
-                field_add, data_add = cls.__load_tables_data(pars_data[i], i, field_add)
-                field.extend(['Width', 'Height', 'Length'])
+                size = map(int, findall(r'(\d{2,3})[хx/\\](\d{2,3})[хx/\\](\d{2,3})', pars_data[i])[0])
+                data_tab = AddData("tables", i)
+                data_add = data_tab.data
+                data_add.extend(size)
+                field.extend(['Length', 'Width', 'Height'])
             elif name == 'comp armchair':
-                field_add = ['UpholsteryMaterial', 'FurnitureAdditions']
-                field_add, data_add = cls.__load_armchair_data(pars_data[i], i, field_add)
+                data_comp = AddData("comp_armchair", i)
+                data_add = data_comp.data
             elif name == "closet":
-                field_add = ['Material', 'Purpose', "Color"]
-                field_add, data_add = cls.__load_closet_data(pars_data[i], i, field_add)
-                field.extend(('Width', 'Height', 'Depth'))
+                size = map(int, findall(r'(\d{2,3})[хx/\\](\d{2,3})[хx/\\](\d{2,3})', pars_data[i])[0])
+                data_cab = AddData("closet", i)
+                data_add = data_cab.data
+                data_add.extend(size)
+                field.extend(('Width', 'Depth', 'Height'))
             elif name == "chairs":
-                field_add = ['SeatMaterial', 'BaseMaterial', 'FurnitureAdditions', "Color"]
-                field_add, data_add = cls.__load_chairs_data(pars_data[i], i, field_add)
+                data_comp = AddData("chairs", i)
+                data_add = data_comp.data
             else:
-                field_add = ['Material', 'FurnitureAdditions', "Color"]
-                data_add = cls.__load_cabinet_data(pars_data[i], i, field_add)
-                field.extend(('Width', 'Height', 'Depth'))
+                size = map(int, findall(r'(\d{2,3})[хx/\\](\d{2,3})[хx/\\](\d{2,3})', pars_data[i])[0])
+                data_cab = AddData("cabinet", i)
+                data_add = data_cab.data
+                data_add.extend(size)
+                field.extend(('Width', 'Depth', 'Height'))
 
             lst = [title, description, int(price[0].replace(' ', '')), image_url, int(art[0]),
                    'https://youtu.be/ycYx204IpKc?si=5z8-v1fOQP2SdfR_', 'Мебель и интерьер',
@@ -272,7 +212,7 @@ class LoadData:
 
     def table_for_avito(self):
         fr = self.__open_xl(self.choose)
-        index = fr["Id"].isnull().sum()
+        index = fr["Address"].isnull().sum()
         start_id = len(fr.index) - index
         ides = set_id(index)
         address, file = set_address(index)
