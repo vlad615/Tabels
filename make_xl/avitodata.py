@@ -28,8 +28,7 @@ def set_address(cont_id: int) -> tuple[list[str], str]:
 
 if __name__ == "__main__":
     assert len(set_id(15)) == 15
-    assert set_address(15) == 15
-    assert set_address(1) == 1
+    assert len(set_address(1)) == 1
     assert set_address(15) == 15
     assert set_address(40) == 40
     assert set_address(25) == 25

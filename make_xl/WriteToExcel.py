@@ -135,8 +135,21 @@ class LoadData:
                     для Директорской, угловых и прямых столов - tables
                     для остальных self.choose
         """
+        df = pd.DataFrame()
+        if name_table in ("straight tables", "corner tables", "director office"):
+            xl = pd.read_excel(f"{cls.__cwd}/data_xl/straight tables.xlsx")[1:]
+            xl1 = pd.read_excel(f"{cls.__cwd}/data_xl/corner tables.xlsx")[1:]
+            xl2 = pd.read_excel(f"{cls.__cwd}/data_xl/director office.xlsx")[1:]
 
-        pass
+            df = pd.concat([xl, xl1, xl2])
+            df = df.reset_index()
+            del df['index']
+
+        else:
+            xl = pd.read_excel(f"{cls.__cwd}/data_xl/{name_table}.xlsx")
+            df = pd.concat([xl])
+
+        return df
 
     @classmethod
     def __read_js(cls):
@@ -164,6 +177,10 @@ class LoadData:
         field = ['Title', 'Description', 'Price', 'ImageUrls', 'Id', 'VideoURL', 'Category', 'AdType', 'Condition',
                  'Availability']
         field.extend(cls._tables_field[name][0])
+        if name in ("straight tables", "corner tables", "director office"):
+            field.extend(['Length', 'Width', 'Height'])
+        elif name in ("closet", "cabinet"):
+            field.extend(('Width', 'Depth', 'Height'))
 
         for i in key:
             title = search(r"(.*)", pars_data[i]).group()
@@ -179,7 +196,6 @@ class LoadData:
                 data_tab = AddData("tables", i)
                 data_add = data_tab.data
                 data_add.extend(size)
-                field.extend(['Length', 'Width', 'Height'])
             elif name == 'comp armchair':
                 data_comp = AddData("comp_armchair", i)
                 data_add = data_comp.data
@@ -188,7 +204,6 @@ class LoadData:
                 data_cab = AddData("closet", i)
                 data_add = data_cab.data
                 data_add.extend(size)
-                field.extend(('Width', 'Depth', 'Height'))
             elif name == "chairs":
                 data_comp = AddData("chairs", i)
                 data_add = data_comp.data
@@ -197,7 +212,6 @@ class LoadData:
                 data_cab = AddData("cabinet", i)
                 data_add = data_cab.data
                 data_add.extend(size)
-                field.extend(('Width', 'Depth', 'Height'))
 
             lst = [title, description, int(price[0].replace(' ', '')), image_url, int(art[0]),
                    'https://youtu.be/ycYx204IpKc?si=5z8-v1fOQP2SdfR_', 'Мебель и интерьер',
@@ -205,7 +219,8 @@ class LoadData:
 
             lst.extend(cls._tables_field[name][1])
             lst.extend(data_add)
-
+            print(field)
+            print(lst)
             fr.loc[len(fr.index), field] = lst
 
         fr.to_excel(f"{cls.__cwd}/data_xl/{name}.xlsx", index=False)
@@ -220,7 +235,6 @@ class LoadData:
         for i in range(index):
             fr.loc[start_id, ["Id", "Address"]] = [ides[i], address[i]]
             start_id += 1
-
         fr.to_excel(file, index=False)
 
     @classmethod
@@ -248,6 +262,6 @@ class LoadData:
 
 
 if __name__ == "__main__":
-    x = LoadData("chairs")
+    x = LoadData("corner tables")
     # # x.start_pars(8)
-    # x.table_for_avito()
+    x.table_for_avito()
