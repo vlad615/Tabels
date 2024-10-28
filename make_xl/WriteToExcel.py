@@ -147,7 +147,7 @@ class LoadData:
 
         else:
             xl = pd.read_excel(f"{cls.__cwd}/data_xl/{name_table}.xlsx")
-            df = pd.concat([xl])
+            df = pd.concat([df, xl])
 
         return df
 
@@ -219,8 +219,6 @@ class LoadData:
 
             lst.extend(cls._tables_field[name][1])
             lst.extend(data_add)
-            print(field)
-            print(lst)
             fr.loc[len(fr.index), field] = lst
 
         fr.to_excel(f"{cls.__cwd}/data_xl/{name}.xlsx", index=False)
@@ -235,7 +233,7 @@ class LoadData:
         for i in range(index):
             fr.loc[start_id, ["Id", "Address"]] = [ides[i], address[i]]
             start_id += 1
-        fr.to_excel(file, index=False)
+        fr.to_excel(file+".xlsx", index=False)
 
     @classmethod
     def __end_program(cls) -> None:
@@ -262,6 +260,6 @@ class LoadData:
 
 
 if __name__ == "__main__":
-    x = LoadData("corner tables")
+    x = LoadData("closet")
     # # x.start_pars(8)
     x.table_for_avito()

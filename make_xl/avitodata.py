@@ -22,7 +22,7 @@ def set_address(cont_id: int) -> tuple[list[str], str]:
         addresses = addresses * (cont_id // 8 + 1)
     shuffle(addresses)
 
-    filepath = filedialog.asksaveasfilename(filetypes=(('Excel files', '*.xlsx'), ), initialfile="avito_table.xlsx")
+    filepath = filedialog.asksaveasfilename(filetypes=(('Excel files', '*.xlsx'), ), initialfile="avito_table")
     return addresses[:cont_id], filepath
 
 
