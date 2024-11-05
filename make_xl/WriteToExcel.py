@@ -8,6 +8,7 @@ import pandas as pd
 from json import load
 import asyncio
 from os import getcwd, scandir, remove
+from tkinter import messagebox as mb
 
 # import uvloop
 
@@ -187,33 +188,41 @@ class LoadData:
             description = pars_data[i] + "\n" + (
                 cls.add_text[name] if name in cls.add_text else cls.add_text['tables']) + "\n" + choice(cls.main_text)
             price = findall(r"Цена[: ]?([\d ]*)", pars_data[i]) or ['']
-            art = findall(r"[Аa]рт(?:икул)?[. (]*([\d]*)", pars_data[i]) or [1]
             image_url = asc_url(i)
-
             data_add = None
-            if name in ("straight tables", "corner tables", "director office"):
-                size = map(int, findall(r'(\d{2,3})[хx/\\](\d{2,3})[хx/\\](\d{2,3})', pars_data[i])[0])
-                data_tab = AddData("tables", i)
-                data_add = data_tab.data
-                data_add.extend(size)
-            elif name == 'comp armchair':
-                data_comp = AddData("comp_armchair", i)
-                data_add = data_comp.data
-            elif name == "closet":
-                size = map(int, findall(r'(\d{2,3})[хx/\\](\d{2,3})[хx/\\](\d{2,3})', pars_data[i])[0])
-                data_cab = AddData("closet", i)
-                data_add = data_cab.data
-                data_add.extend(size)
-            elif name == "chairs":
-                data_comp = AddData("chairs", i)
-                data_add = data_comp.data
-            else:
-                size = map(int, findall(r'(\d{2,3})[хx/\\](\d{2,3})[хx/\\](\d{2,3})', pars_data[i])[0])
-                data_cab = AddData("cabinet", i)
-                data_add = data_cab.data
-                data_add.extend(size)
+            art = None
 
-            lst = [title, description, int(price[0].replace(' ', '')), image_url, int(art[0]),
+            try:
+                art = findall(r"[Аa]рт(?:икул)?[. (]*([\d]*)", pars_data[i])[0]
+            except IndexError:
+                art = 1
+            try:
+                if name in ("straight tables", "corner tables", "director office"):
+                    size = map(int, findall(r'(\d{2,3})[хx/\\](\d{2,3})[хx/\\](\d{2,3})', pars_data[i])[0])
+                    data_tab = AddData("tables", i)
+                    data_add = data_tab.data
+                    data_add.extend(size)
+                elif name == 'comp armchair':
+                    data_comp = AddData("comp_armchair", i)
+                    data_add = data_comp.data
+                elif name == "closet":
+                    size = map(int, findall(r'(\d{2,3})[хx/\\](\d{2,3})[хx/\\](\d{2,3})', pars_data[i])[0])
+                    data_cab = AddData("closet", i)
+                    data_add = data_cab.data
+                    data_add.extend(size)
+                elif name == "chairs":
+                    data_comp = AddData("chairs", i)
+                    data_add = data_comp.data
+                else:
+                    size = map(int, findall(r'(\d{2,3})[хx/\\](\d{2,3})[хx/\\](\d{2,3})', pars_data[i])[0])
+                    data_cab = AddData("cabinet", i)
+                    data_add = data_cab.data
+                    data_add.extend(size)
+            except IndexError:
+                mb.showerror("Error", "Проверьте правильность заполнения размеров в телеграме!")
+                return None
+
+            lst = [title, description, int(price[0].replace(' ', '')), image_url, int(art),
                    'https://youtu.be/ycYx204IpKc?si=5z8-v1fOQP2SdfR_', 'Мебель и интерьер',
                    'Товар приобретен на продажу', 'Б/у', 'В наличии']
 
@@ -233,7 +242,7 @@ class LoadData:
         for i in range(index):
             fr.loc[start_id, ["Id", "Address"]] = [ides[i], address[i]]
             start_id += 1
-        fr.to_excel(file+".xlsx", index=False)
+        fr.to_excel(file + ".xlsx", index=False)
 
     @classmethod
     def __end_program(cls) -> None:
