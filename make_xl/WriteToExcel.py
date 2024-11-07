@@ -193,8 +193,8 @@ class LoadData:
             art = None
 
             try:
-                art = findall(r"[Аa]рт(?:икул)?[. (]*([\d]*)", pars_data[i])[0]
-            except IndexError:
+                art = findall(r"[Аa]рт(?:икул)?[:. (]*([\d]*)", pars_data[i])[0]
+            except (IndexError, ValueError):
                 art = 1
             try:
                 if name in ("straight tables", "corner tables", "director office"):
