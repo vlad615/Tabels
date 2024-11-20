@@ -18,7 +18,7 @@ class AddData:
         self.canvas.create_image(0, 0, anchor=NW, image=self.photo)
         self.variables = {
             "closet": {'Material': ["МДФ", "Металл", "Пластик", "ДСП"],
-                       'Purpose': ["Кабинет", "Офис", "Балкон", "Гостинная", "Прихожая", "Спальня"],
+                       'Purpose': ["Кабинет", "Офис", "Балкон", "Гостиная", "Прихожая", "Спальня"],
                        "Color": colors},
             "comp_armchair": {'UpholsteryMaterial': ["Искусственная кожа", "Кожа", "Ткань", "Сетка", "Замша", "Дерево"],
                               'FurnitureAdditions': ["Подлокотники", "Подголовник", "Механизм качания",
