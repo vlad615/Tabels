@@ -9,8 +9,10 @@ from json import load
 import asyncio
 from os import getcwd, scandir, remove
 from tkinter import messagebox as mb
-
+from logging import getLogger
 # import uvloop
+
+logger = getLogger(__name__)
 
 """
     class LoadData
@@ -185,17 +187,22 @@ class LoadData:
 
         for i in key:
             title = search(r"(.*)", pars_data[i]).group()
-            description = pars_data[i] + "\n" + (
-                cls.add_text[name] if name in cls.add_text else cls.add_text['tables']) + "\n" + choice(cls.main_text)
-            price = findall(r"Цена[: ]?([\d ]*)", pars_data[i]) or ['']
-            image_url = asc_url(i)
-            data_add = None
             art = None
 
             try:
                 art = findall(r"[Аa]рт(?:икул)?[:. (]*([\d]*)", pars_data[i])[0]
             except (IndexError, ValueError):
                 art = 1
+
+            description = pars_data[i] + "\n" + (
+                cls.add_text[name] if name in cls.add_text else cls.add_text['tables']) + "\n" + choice(cls.main_text)
+            price = findall(r"Цена[: ]?([\d ]*)", pars_data[i]) or ['']
+            logger.info(f"Добавление товара {title, art}")
+            image_url: str = asc_url(i)
+            logger.info(f"Ввод ссылок {art}: {image_url}")
+
+            data_add = None
+
             try:
                 if name in ("straight tables", "corner tables", "director office"):
                     size = map(int, findall(r'(\d{2,3})[хx/\\](\d{2,3})[хx/\\](\d{2,3})', pars_data[i])[0])
@@ -219,9 +226,11 @@ class LoadData:
                     data_add = data_cab.data
                     data_add.extend(size)
             except IndexError:
-                mb.showerror("Error", "Проверьте правильность заполнения размеров в телеграме!")
+                logger.info(f"Ошибка размеров {title, art}")
+                mb.showerror("Error", f"Проверьте правильность заполнения размеров в телеграме {title, art}!")
                 return None
 
+            logger.info(f"Добавление в таблицу {title} Цена {price[0]}, Артикул {art}")
             lst = [title, description, int(price[0].replace(' ', '')), image_url, int(art),
                    'https://youtu.be/ycYx204IpKc?si=5z8-v1fOQP2SdfR_', 'Мебель и интерьер',
                    'Товар приобретен на продажу', 'Б/у', 'В наличии']
@@ -251,6 +260,7 @@ class LoadData:
         """
         pat = f"{cls.__cwd}/data_xl/photo"
         files = scandir(pat)
+        logger.info("Удаление временных файлов")
         for i in files:
             remove(i)
 
@@ -270,5 +280,10 @@ class LoadData:
 
 if __name__ == "__main__":
     x = LoadData("closet")
-    # # x.start_pars(8)
+    # x.start_pars(8)
+    """2405 https://disk.yandex.ru/i/CmEk-NECdwHB8w | https://disk.yandex.ru/i/q1G5qvIrqPC9IA | https://disk.yandex.ru/i/3l46czErhki8ew | https://disk.yandex.ru/i/RVzEhNjI-JrmDQ | https://disk.yandex.ru/i/xwXN3y4xXXlm1w | https://disk.yandex.ru/i/0yyml94uKUfR4A
+   2402 https://disk.yandex.ru/i/4LayF23aQkTfEg | https://disk.yandex.ru/i/X6ktGGwQYIQJ2w | https://disk.yandex.ru/i/8oIhCY14I2l_iA | https://disk.yandex.ru/i/cPoCF322w2NktA | https://disk.yandex.ru/i/WQG2Aw1jYMH-4g
+   2403 https://disk.yandex.ru/i/I8Uv220ZcCErDg | https://disk.yandex.ru/i/Bou-J10O9fTcOw | https://disk.yandex.ru/i/m3GYGkUuN4jPzQ | https://disk.yandex.ru/i/LOE95xtfVjuUbQ | https://disk.yandex.ru/i/gI40jp71OfWDUw | https://disk.yandex.ru/i/CbQnvBK8z7TzFA | https://disk.yandex.ru/i/teNitwgX_yswQA | https://disk.yandex.ru/i/g0S4Q7WrHb6uww | https://disk.yandex.ru/i/IOXabVHBF-_A-g
+    2406 https://disk.yandex.ru/i/QjFYRV6r87HDOw | https://disk.yandex.ru/i/hUM5pfcQ0rpYog | https://disk.yandex.ru/i/wZ6fx1iX22ZB5g | https://disk.yandex.ru/i/c69C1avvqCPCRQ | https://disk.yandex.ru/i/5gu7N_yvjL_C8g | https://disk.yandex.ru/i/8l1CD6Zx2ZT-HA
+    """
     x.table_for_avito()

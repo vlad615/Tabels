@@ -5,7 +5,9 @@ from pyrogram import Client
 from json import dump
 import asyncio
 from os import getcwd
+from logging import getLogger
 
+logger = getLogger(__name__)
 """
     CopyContent - скачивает фото с телеграмм каналов у которых есть описание. И создает json file, 
     где key - номер сообщения, value - описание. Имя каждого фото соответствует kye в js file.
@@ -34,6 +36,7 @@ class CopyContent:
                 path = self.__cwd + f'\\data_xl\\photo\\{iid}.jpeg'
                 await self.__client.download_media(message=i, file_name=path)
                 self.data[f"{iid}"] = str(cap)
+                logger.info(f"Добавление товара {cap}")
 
         return self.data
 

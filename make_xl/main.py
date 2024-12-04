@@ -3,6 +3,11 @@ from WriteToExcel import LoadData
 from tkinter import font
 from tkinter import messagebox as mb
 from functools import wraps
+from logging import getLogger, basicConfig, INFO
+
+logger = getLogger()
+FORMAT = "%(name)s : %(levelname)s : %(message)s"
+basicConfig(level=INFO, format=FORMAT)
 
 
 def event(func):
@@ -53,6 +58,7 @@ def add_goods(channel, con, root):
         if not con.isdigit():
             mb.showerror('Error', "Введите количество сообщений для обработки")
         else:
+            logger.info(f"Запуск программы добавления в таблицу {channel}")
             data = LoadData(channel)
             root.destroy()
             data.start_pars(int(con))
@@ -62,6 +68,7 @@ def add_goods(channel, con, root):
 
 def download(channel):
     try:
+        logger.info(f"Скачивание таблицы {channel}")
         data = LoadData(channel)
         data.table_for_avito()
     except IndexError:
