@@ -196,7 +196,7 @@ class LoadData:
 
             description = pars_data[i] + "\n" + (
                 cls.add_text[name] if name in cls.add_text else cls.add_text['tables']) + "\n" + choice(cls.main_text)
-            price = findall(r"Цена[: ]?([\d ]*)", pars_data[i]) or ['']
+            price = findall(r"Цена[: ]?([\d ]*)", pars_data[i]) or ["1"]
             logger.info(f"Добавление товара {title, art}")
             image_url: str = asc_url(i)
             logger.info(f"Ввод ссылок {art}: {image_url}")
