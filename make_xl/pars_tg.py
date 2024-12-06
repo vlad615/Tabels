@@ -30,6 +30,7 @@ class CopyContent:
         await self.__client.start()
         messages: AsyncGenerator[Message, None] = self.__client.get_chat_history(chat_id=donor_channel, limit=lim)
         async for i in messages:
+            print(i)
             cap = i.caption
             iid = i.id
             if cap:
@@ -39,6 +40,23 @@ class CopyContent:
                 logger.info(f"Добавление товара {cap}")
 
         return self.data
+
+    async def deleting(self, lim):
+        data = {"Кресла": [], "КАБИНЕТЫ ДИРЕКТОРА": [], "СТОЛЫ ПРЯМЫЕ": [], "СТОЛЫ УГЛОВЫЕ": [], "СТУЛЬЯ": []}
+        await self.__client.start()
+        messages: AsyncGenerator[Message, None] = self.__client.get_chat_history(chat_id=-1001725812699, limit=lim)
+        async for i in messages:
+            logger.info(f"Проверка сообщения {i}")
+            title = i.forward_from_chat.title
+            print(title)
+            if title in data.keys():
+                cap = i.caption
+                # print(title, cap)
+                if cap:
+                    data[title].append(cap)
+                    logger.info(f"Добавление в очередь на удаление {cap}")
+
+        return data
 
     def dump_data(self) -> None:
         """
@@ -57,5 +75,7 @@ if __name__ == "__main__":
                 "corner tables": -1001492485587,
                 "chairs": -1001430077633}
     copytables = CopyContent()
-    asyncio.run(copytables.copy_content(channels["comp armchair"], 9))
+    # asyncio.run(copytables.copy_content(-1001725812699, 10))
+    print(asyncio.run(copytables.deleting(46)))
+
     copytables.dump_data()

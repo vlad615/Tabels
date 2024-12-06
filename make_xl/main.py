@@ -1,9 +1,13 @@
 from tkinter import *
+from pars_tg import CopyContent
+import asyncio
 from WriteToExcel import LoadData
+# import uvloop
 from tkinter import font
 from tkinter import messagebox as mb
 from functools import wraps
 from logging import getLogger, basicConfig, INFO
+
 
 logger = getLogger()
 FORMAT = "%(name)s : %(levelname)s : %(message)s"
@@ -24,13 +28,14 @@ def start():
     root = Tk()
     root.title("Создание таблиц для авито")
 
-    vals = {"Прямые столы": "straight tables",
-            "Угловые столы": "corner tables",
-            "Директорская мебель": "director office",
-            "Компьютерные кресла": "comp armchair",
-            "Стулья": "chairs",
-            "Шкафы": "closet",
-            "Тумбы": "cabinet"}
+    vals = {"Прямые столы": ("straight tables", -1001166492970),
+            "Угловые столы": ("corner tables", -1001492485587),
+            "Директорская мебель": ("director office", -1001479107169),
+            "Компьютерные кресла": ("comp armchair", -1001198770422),
+            "Стулья": ("chairs", -1001430077633),
+            "Шкафы": ("closet", -1001390310467),
+            "Тумбы": ("cabinet", -1001216807024),
+            "Продано": -1001725812699}
 
     key = list(vals.keys())
     variable = Variable(value=key)
@@ -59,9 +64,14 @@ def add_goods(channel, con, root):
             mb.showerror('Error', "Введите количество сообщений для обработки")
         else:
             logger.info(f"Запуск программы добавления в таблицу {channel}")
-            data = LoadData(channel)
+            content = CopyContent()
+
+            # uvloop.install()
+            asyncio.run(content.copy_content(channel[1], int(con)))
+            content.dump_data()
+            data = LoadData(channel[0])
             root.destroy()
-            data.start_pars(int(con))
+            data.start_pars()
     except IndexError:
         mb.showerror("Error", "Выберите канал для скачивания данных!")
 
@@ -69,7 +79,7 @@ def add_goods(channel, con, root):
 def download(channel):
     try:
         logger.info(f"Скачивание таблицы {channel}")
-        data = LoadData(channel)
+        data = LoadData(channel[0])
         data.table_for_avito()
     except IndexError:
         mb.showerror("Error", "Выберите таблицу для скачивания!")
@@ -78,3 +88,6 @@ def download(channel):
 
 
 start()
+
+if __name__=="__main__":
+    start()

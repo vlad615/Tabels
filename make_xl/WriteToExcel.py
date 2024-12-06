@@ -1,16 +1,13 @@
 from re import search, findall
 from random import choice
-from pars_tg import CopyContent
 from UrlPhoto import asc_url
 from add_data import AddData
 from avitodata import set_id, set_address
 import pandas as pd
 from json import load
-import asyncio
 from os import getcwd, scandir, remove
 from tkinter import messagebox as mb
 from logging import getLogger
-# import uvloop
 
 logger = getLogger(__name__)
 
@@ -26,13 +23,6 @@ logger = getLogger(__name__)
 
 
 class LoadData:
-    _channels = {"straight tables": -1001166492970,
-                 "comp armchair": -1001198770422,
-                 "cabinet": -1001216807024,
-                 "closet": -1001390310467,
-                 "director office": -1001479107169,
-                 "corner tables": -1001492485587,
-                 "chairs": -1001430077633}
     __cwd = getcwd()
     main_text = ["""Для того, чтобы получить больше предложений и подобрать мебель под ваши личные нужды напишите или позвоните нам---->
     🔥 Система больших скидок действует при опте и в праздничные дни 
@@ -41,7 +31,6 @@ class LoadData:
     ➕ Адрес: Склад в г. Одинцово улица Старое Яскино 75ст2. Ориентир ворота с вывеской Офис Комфорт
     ➕ При поиске нас в навигаторе наберите – 
     Офис комфорт Одинцово 
-    ➕ Наш телеграмм канал – office comfort es
     🕒 График: Часы работы склада с 10 до 19, Выходной Вс. 
     -------------------------------------------------------------------
     Oфис Комфорт — это большой склад офисной мебели, после закрытия больших организаций, в городе Одинцово М.О.
@@ -52,7 +41,6 @@ class LoadData:
             ➕ Адрес: Склад в г. Одинцово улица Старое Яскино 75ст2. Ориентир ворота с вывеской Офис Комфорт
             ➕ При поиске нас в навигаторе наберите – 
             Офис комфорт Одинцово 
-            ➕ Наш телеграмм канал – office comfort es
             🕒 График: Часы работы склада с 10 до 19, Выходной Вс. 
             -------------------------------------------------------------------
             Oфис Комфорт — это большой склад офисной мебели, после закрытия больших организаций, в городе Одинцово М.О.
@@ -119,8 +107,6 @@ class LoadData:
                             ['Столы и стулья', 'Столы', 'Нет']]
 
     }
-
-    __content = CopyContent()
 
     def __init__(self, choose: str):
         self.choose = choose
@@ -197,6 +183,13 @@ class LoadData:
             description = pars_data[i] + "\n" + (
                 cls.add_text[name] if name in cls.add_text else cls.add_text['tables']) + "\n" + choice(cls.main_text)
             price = findall(r"Цена[: ]?([\d ]*)", pars_data[i]) or ["1"]
+            try:
+                price = int(price[0].replace(' ', ''))
+            except (IndexError, ValueError):
+                logger.info(f"Ошибка размеров {title, art}")
+                mb.showerror("Error", f"Проверьте правильность заполнения размеров в телеграме {title, art}!")
+                return None
+
             logger.info(f"Добавление товара {title, art}")
             image_url: str = asc_url(i)
             logger.info(f"Ввод ссылок {art}: {image_url}")
@@ -230,8 +223,8 @@ class LoadData:
                 mb.showerror("Error", f"Проверьте правильность заполнения размеров в телеграме {title, art}!")
                 return None
 
-            logger.info(f"Добавление в таблицу {title} Цена {price[0]}, Артикул {art}")
-            lst = [title, description, int(price[0].replace(' ', '')), image_url, int(art),
+            logger.info(f"Добавление в таблицу {title} Цена {price}, Артикул {art}")
+            lst = [title, description, price, image_url, int(art),
                    'https://youtu.be/ycYx204IpKc?si=5z8-v1fOQP2SdfR_', 'Мебель и интерьер',
                    'Товар приобретен на продажу', 'Б/у', 'В наличии']
 
@@ -266,14 +259,9 @@ class LoadData:
 
     def start_pars(self, count_mass: int):
         """
-            Запуск парсера
-            Загрузка текста в файл
             Запуск загрузки данных в эксель таблицу
             Удаление фото
         """
-        # uvloop.install()
-        asyncio.run(self.__content.copy_content(self._channels[self.choose], count_mass))
-        self.__content.dump_data()
         self.__load_data_xl(self.choose)
         self.__end_program()
 
