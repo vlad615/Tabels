@@ -108,7 +108,7 @@ class LoadData:
 
     }
 
-    def __init__(self, choose: str):
+    def __init__(self, choose: str = None):
         self.choose = choose
 
     @classmethod
@@ -257,7 +257,29 @@ class LoadData:
         for i in files:
             remove(i)
 
-    def start_pars(self, count_mass: int):
+    @classmethod
+    def start_del(cls):
+        alls = False
+        dont_del = []
+        tables = {"Кресла": "comp armchair.xlsx", "КАБИНЕТЫ ДИРЕКТОРА": "director office.xlsx",
+                  "СТОЛЫ ПРЯМЫЕ": "straight tables.xlsx", "СТОЛЫ УГЛОВЫЕ": "corner tables.xlsx", "СТУЛЬЯ": "chairs.xlsx"}
+        pars_data = cls.__read_js()
+        for key, val in pars_data:
+            db = pd.read_excel(f"{cls.__cwd}/data_xl/{tables[key]}")
+            for i in val:
+                length = len(db[db["Id"] == i].index)
+                if length == 1:
+                    db = db.drop(db[db["Id"] == i].index)
+                elif length <= 2:
+                    alls = True
+                    dont_del.append(i)
+            db.to_excel(f"{cls.__cwd}/data_xl/{tables[key]}")
+
+        if alls:
+            mb.showinfo('Attention', f"""Товары с артикулом {dont_del} небыли удалены, 
+            так как их более 1 в таблице""")
+
+    def start_dump(self):
         """
             Запуск загрузки данных в эксель таблицу
             Удаление фото

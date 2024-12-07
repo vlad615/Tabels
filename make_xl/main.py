@@ -34,8 +34,7 @@ def start():
             "Компьютерные кресла": ("comp armchair", -1001198770422),
             "Стулья": ("chairs", -1001430077633),
             "Шкафы": ("closet", -1001390310467),
-            "Тумбы": ("cabinet", -1001216807024),
-            "Продано": -1001725812699}
+            "Тумбы": ("cabinet", -1001216807024),}
 
     key = list(vals.keys())
     variable = Variable(value=key)
@@ -49,6 +48,8 @@ def start():
                                                                        enter_count.get(), root))
     but_download = Button(text="Скачать таблицу", command=lambda: download(vals[key[listbox.curselection()[0]]]))
 
+    but_delete = Button(text="Удалить проданые", command=lambda: enter_count.get())
+
     listbox.grid(row=0, column=0, columnspan=2, sticky="w", padx=5, pady=5)
     label.grid(row=1, column=0, columnspan=2, sticky="w", padx=3, pady=5)
     enter_count.grid(row=2, column=0, columnspan=2, sticky="w", padx=3, pady=5)
@@ -57,8 +58,22 @@ def start():
     root.mainloop()
 
 
+def delete_goods(count: str):
+    if not count.isdigit():
+        mb.showerror('Error', "Введите количество сообщений для обработки")
+    else:
+        logger.info(f"Запуск обновления таблиц")
+        content = CopyContent()
+
+        # uvloop.install()
+        asyncio.run(content.deleting(int(count)))
+        content.dump_data()
+        data = LoadData()
+        data.start_del()
+
+
 @event
-def add_goods(channel, con, root):
+def add_goods(channel: tuple, con: str, root):
     try:
         if not con.isdigit():
             mb.showerror('Error', "Введите количество сообщений для обработки")
@@ -71,7 +86,7 @@ def add_goods(channel, con, root):
             content.dump_data()
             data = LoadData(channel[0])
             root.destroy()
-            data.start_pars()
+            data.start_dump()
     except IndexError:
         mb.showerror("Error", "Выберите канал для скачивания данных!")
 
