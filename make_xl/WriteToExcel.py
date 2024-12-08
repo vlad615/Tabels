@@ -146,7 +146,7 @@ class LoadData:
             Открывает файл с запарсенными данными и передает их
         """
         try:
-            with open(f"{cls.__cwd}/data_xl/captions", "r") as f:
+            with open(f"{cls.__cwd}/data_xl/captions.json", "r") as f:
                 cont = load(f)
                 return cont
         except FileNotFoundError:
@@ -156,8 +156,7 @@ class LoadData:
     def __load_data_xl(cls, name: str) -> None:
         """
             Запускает функцию загрузки данных и добавляет фото в таблицу
-            Принимает
-                name - self.choose
+            Принимает name - self.choose
         """
         pars_data = cls.__read_js()
         xl = pd.read_excel(f"{cls.__cwd}/data_xl/{name}.xlsx")
@@ -264,13 +263,16 @@ class LoadData:
         tables = {"Кресла": "comp armchair.xlsx", "КАБИНЕТЫ ДИРЕКТОРА": "director office.xlsx",
                   "СТОЛЫ ПРЯМЫЕ": "straight tables.xlsx", "СТОЛЫ УГЛОВЫЕ": "corner tables.xlsx", "СТУЛЬЯ": "chairs.xlsx"}
         pars_data = cls.__read_js()
-        for key, val in pars_data:
+        for key, val in pars_data.items():
+            logger.info(f"Удаление из {key}")
             db = pd.read_excel(f"{cls.__cwd}/data_xl/{tables[key]}")
             for i in val:
                 length = len(db[db["Id"] == i].index)
                 if length == 1:
+                    logger.info(f".... удаление {i}")
                     db = db.drop(db[db["Id"] == i].index)
                 elif length <= 2:
+                    logger.info(f"Не удалено: {i} - колличество в таблице {length}")
                     alls = True
                     dont_del.append(i)
             db.to_excel(f"{cls.__cwd}/data_xl/{tables[key]}")
@@ -291,9 +293,4 @@ class LoadData:
 if __name__ == "__main__":
     x = LoadData("closet")
     # x.start_pars(8)
-    """2405 https://disk.yandex.ru/i/CmEk-NECdwHB8w | https://disk.yandex.ru/i/q1G5qvIrqPC9IA | https://disk.yandex.ru/i/3l46czErhki8ew | https://disk.yandex.ru/i/RVzEhNjI-JrmDQ | https://disk.yandex.ru/i/xwXN3y4xXXlm1w | https://disk.yandex.ru/i/0yyml94uKUfR4A
-   2402 https://disk.yandex.ru/i/4LayF23aQkTfEg | https://disk.yandex.ru/i/X6ktGGwQYIQJ2w | https://disk.yandex.ru/i/8oIhCY14I2l_iA | https://disk.yandex.ru/i/cPoCF322w2NktA | https://disk.yandex.ru/i/WQG2Aw1jYMH-4g
-   2403 https://disk.yandex.ru/i/I8Uv220ZcCErDg | https://disk.yandex.ru/i/Bou-J10O9fTcOw | https://disk.yandex.ru/i/m3GYGkUuN4jPzQ | https://disk.yandex.ru/i/LOE95xtfVjuUbQ | https://disk.yandex.ru/i/gI40jp71OfWDUw | https://disk.yandex.ru/i/CbQnvBK8z7TzFA | https://disk.yandex.ru/i/teNitwgX_yswQA | https://disk.yandex.ru/i/g0S4Q7WrHb6uww | https://disk.yandex.ru/i/IOXabVHBF-_A-g
-    2406 https://disk.yandex.ru/i/QjFYRV6r87HDOw | https://disk.yandex.ru/i/hUM5pfcQ0rpYog | https://disk.yandex.ru/i/wZ6fx1iX22ZB5g | https://disk.yandex.ru/i/c69C1avvqCPCRQ | https://disk.yandex.ru/i/5gu7N_yvjL_C8g | https://disk.yandex.ru/i/8l1CD6Zx2ZT-HA
-    """
     x.table_for_avito()

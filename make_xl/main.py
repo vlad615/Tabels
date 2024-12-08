@@ -48,13 +48,14 @@ def start():
                                                                        enter_count.get(), root))
     but_download = Button(text="Скачать таблицу", command=lambda: download(vals[key[listbox.curselection()[0]]]))
 
-    but_delete = Button(text="Удалить проданые", command=lambda: enter_count.get())
+    but_delete = Button(text="Удалить проданые", command=lambda: delete_goods(enter_count.get()))
 
     listbox.grid(row=0, column=0, columnspan=2, sticky="w", padx=5, pady=5)
     label.grid(row=1, column=0, columnspan=2, sticky="w", padx=3, pady=5)
     enter_count.grid(row=2, column=0, columnspan=2, sticky="w", padx=3, pady=5)
     but_pars.grid(row=3, column=0, sticky="w", padx=3, pady=5)
     but_download.grid(row=3, column=1, sticky="w", padx=3, pady=5)
+    but_delete.grid(row=3, column=1, sticky="e", padx=3, pady=5)
     root.mainloop()
 
 
@@ -104,5 +105,5 @@ def download(channel):
 
 start()
 
-if __name__=="__main__":
-    start()
+# if __name__=="__main__":
+#     start()

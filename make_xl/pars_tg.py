@@ -1,3 +1,5 @@
+from encodings.utf_7 import encode
+
 from key import API_ID, API_HASH
 from typing import AsyncGenerator
 from pyrogram.types import Message
@@ -52,16 +54,19 @@ class CopyContent:
             if title in self.data.keys():
                 cap = i.caption
                 if cap:
-                    art = findall(r"[Аa]рт(?:икул)?[:. (]*([\d]*)", cap)[0]
-                    self.data[title].append(int(art))
-                    logger.info(f"Добавление в очередь на удаление {art}")
+                    try:
+                        art = findall(r"[Аa]рт(?:икул)?[:. (]*([\d]*)", cap)[0]
+                        self.data[title].append(int(art))
+                        logger.info(f"Добавление в очередь на удаление {art}")
+                    except (IndexError, TypeError):
+                        pass
         return self.data
 
     def dump_data(self) -> None:
         """
             Загрузка данных в json file
         """
-        with open(f"{self.__cwd}/data_xl/captions", "w") as f:
+        with open(f"{self.__cwd}/data_xl/captions.json", "w") as f:
             dump(self.data, f, ensure_ascii=False, indent=4)
 
 
