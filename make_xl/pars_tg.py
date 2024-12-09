@@ -1,5 +1,3 @@
-from encodings.utf_7 import encode
-
 from key import API_ID, API_HASH
 from typing import AsyncGenerator
 from pyrogram.types import Message

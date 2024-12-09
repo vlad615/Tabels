@@ -186,7 +186,7 @@ class LoadData:
                 price = int(price[0].replace(' ', ''))
             except (IndexError, ValueError):
                 logger.info(f"Ошибка размеров {title, art}")
-                mb.showerror("Error", f"Проверьте правильность заполнения размеров в телеграме {title, art}!")
+                mb.showerror("Error", f"Проверьте правильность цены в телеграме {title, art}!")
                 return None
 
             logger.info(f"Добавление товара {title, art}")
@@ -275,7 +275,7 @@ class LoadData:
                     logger.info(f"Не удалено: {i} - колличество в таблице {length}")
                     alls = True
                     dont_del.append(i)
-            db.to_excel(f"{cls.__cwd}/data_xl/{tables[key]}")
+            db.to_excel(f"{cls.__cwd}/data_xl/{tables[key]}", index=False)
 
         if alls:
             mb.showinfo('Attention', f"""Товары с артикулом {dont_del} небыли удалены, 
@@ -293,4 +293,5 @@ class LoadData:
 if __name__ == "__main__":
     x = LoadData("closet")
     # x.start_pars(8)
-    x.table_for_avito()
+    # x.table_for_avito()
+    x.start_del()
