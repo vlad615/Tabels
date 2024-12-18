@@ -1,8 +1,8 @@
 import yadisk
-from key import API_ID, APL_SCR, YA_TOKEN
+from key import APL_ID, APL_SCR, YA_TOKEN
 
 
-client = yadisk.Client(id=API_ID, secret=APL_SCR, token=YA_TOKEN)
+client = yadisk.Client(id=APL_ID, secret=APL_SCR, token=YA_TOKEN)
 # or
 # client = yadisk.Client("<application-id>", "<application-secret>", "<token>")
 
