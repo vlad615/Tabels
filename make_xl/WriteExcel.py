@@ -11,6 +11,51 @@ from logging import getLogger
 
 logger = getLogger(__name__)
 
+class ChangeTabel:
+    __cwd = getcwd()
+    def __init__(self, choose: str = None):
+        self.choose = choose
+    @classmethod
+    def __open_xl(cls, name_table: str) -> pd.DataFrame:
+        """
+            Открытие таблицы и чтение с нее данных в ДатаФрейм.
+
+            Принимает:
+                name_table = self.choose
+            Возвращает:
+                DataFrame - данные из таблицы дозаполнения
+                name - название открытой таблицы:
+                    для Директорской, угловых и прямых столов - tables
+                    для остальных self.choose
+        """
+        df = pd.DataFrame()
+        if name_table in ("straight tables", "corner tables", "director office"):
+            xl = pd.read_excel(f"{cls.__cwd}/data_xl/straight tables.xlsx")[1:]
+            xl1 = pd.read_excel(f"{cls.__cwd}/data_xl/corner tables.xlsx")[1:]
+            xl2 = pd.read_excel(f"{cls.__cwd}/data_xl/director office.xlsx")[1:]
+
+            df = pd.concat([xl, xl1, xl2])
+            df = df.reset_index()
+            del df['index']
+
+        else:
+            xl = pd.read_excel(f"{cls.__cwd}/data_xl/{name_table}.xlsx")
+            df = pd.concat([df, xl])
+
+        return df
+
+    def table_for_avito(self):
+        fr = self.__open_xl(self.choose)
+        index = fr["Address"].isnull().sum()
+        start_id = len(fr.index) - index
+        ides = set_id(index)
+        address, file = set_address(index)
+
+        for i in range(index):
+            fr.loc[start_id, ["Id", "Address"]] = [ides[i], address[i]]
+            start_id += 1
+        fr.to_excel(file + ".xlsx", index=False)
+
 """
     class LoadData
         Запускает парсер телеграмма и загружает данные в таблицу.
@@ -20,7 +65,6 @@ logger = getLogger(__name__)
             chairs.
         count_mass - количество фото,которое должно войти в парсинг
 """
-
 
 class LoadData:
     __cwd = getcwd()
@@ -112,35 +156,6 @@ class LoadData:
         self.choose = choose
 
     @classmethod
-    def __open_xl(cls, name_table: str) -> pd.DataFrame:
-        """
-            Открытие таблицы и чтение с нее данных в ДатаФрейм.
-
-            Принимает:
-                name_table = self.choose
-            Возвращает:
-                DataFrame - данные из таблицы дозаполнения
-                name - название открытой таблицы:
-                    для Директорской, угловых и прямых столов - tables
-                    для остальных self.choose
-        """
-        df = pd.DataFrame()
-        if name_table in ("straight tables", "corner tables", "director office"):
-            xl = pd.read_excel(f"{cls.__cwd}/data_xl/straight tables.xlsx")[1:]
-            xl1 = pd.read_excel(f"{cls.__cwd}/data_xl/corner tables.xlsx")[1:]
-            xl2 = pd.read_excel(f"{cls.__cwd}/data_xl/director office.xlsx")[1:]
-
-            df = pd.concat([xl, xl1, xl2])
-            df = df.reset_index()
-            del df['index']
-
-        else:
-            xl = pd.read_excel(f"{cls.__cwd}/data_xl/{name_table}.xlsx")
-            df = pd.concat([df, xl])
-
-        return df
-
-    @classmethod
     def __read_js(cls):
         """
             Открывает файл с запарсенными данными и передает их
@@ -196,26 +211,19 @@ class LoadData:
 
             data_add = None
 
+            logger.info(f"Добавление размеров и проч. данных {title, art}")
             try:
                 if name in ("straight tables", "corner tables", "director office"):
                     size = map(int, findall(r'(\d{2,3})[хx/\\](\d{2,3})[хx/\\](\d{2,3})', pars_data[i])[0])
                     data_tab = AddData("tables", i)
                     data_add = data_tab.data
                     data_add.extend(size)
-                elif name == 'comp armchair':
-                    data_comp = AddData("comp_armchair", i)
+                elif name in ('comp armchair', "chairs"):
+                    data_comp = AddData(name, i)
                     data_add = data_comp.data
-                elif name == "closet":
+                elif name in ("closet", "cabinet"):
                     size = map(int, findall(r'(\d{2,3})[хx/\\](\d{2,3})[хx/\\](\d{2,3})', pars_data[i])[0])
-                    data_cab = AddData("closet", i)
-                    data_add = data_cab.data
-                    data_add.extend(size)
-                elif name == "chairs":
-                    data_comp = AddData("chairs", i)
-                    data_add = data_comp.data
-                else:
-                    size = map(int, findall(r'(\d{2,3})[хx/\\](\d{2,3})[хx/\\](\d{2,3})', pars_data[i])[0])
-                    data_cab = AddData("cabinet", i)
+                    data_cab = AddData(name, i)
                     data_add = data_cab.data
                     data_add.extend(size)
             except IndexError:
@@ -224,7 +232,7 @@ class LoadData:
                 return None
 
             logger.info(f"Добавление в таблицу {title} Цена {price}, Артикул {art}")
-            lst = [title, description, price, image_url, int(art),
+            lst = [title, description, price, image_url, art,
                    'https://youtu.be/ycYx204IpKc?si=5z8-v1fOQP2SdfR_', 'Мебель и интерьер',
                    'Товар приобретен на продажу', 'Б/у', 'В наличии']
 
@@ -232,19 +240,8 @@ class LoadData:
             lst.extend(data_add)
             fr.loc[len(fr.index), field] = lst
 
+        logger.info("Загрузка в таблицу")
         fr.to_excel(f"{cls.__cwd}/data_xl/{name}.xlsx", index=False)
-
-    def table_for_avito(self):
-        fr = self.__open_xl(self.choose)
-        index = fr["Address"].isnull().sum()
-        start_id = len(fr.index) - index
-        ides = set_id(index)
-        address, file = set_address(index)
-
-        for i in range(index):
-            fr.loc[start_id, ["Id", "Address"]] = [ides[i], address[i]]
-            start_id += 1
-        fr.to_excel(file + ".xlsx", index=False)
 
     @classmethod
     def __end_program(cls) -> None:

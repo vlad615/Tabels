@@ -1,11 +1,14 @@
 from tkinter import *
 from PIL import Image, ImageTk
 from tkinter import messagebox as mb
+from logging import getLogger
 
+logger = getLogger(__name__)
 
 class AddData:
 
     def __init__(self, table: str, photo: str):
+        logger.info("Добавление данных в ручную")
         colors = ["Бежевый", "Белый", "Бирюзовый", "Бордовый", "Голубой", "Жёлтый", "Зелёный", "Коричневый", "Красный",
                   "Оранжевый", "Розовый", "Серебристый", "Серый", "Синий", "Фиолетовый", "Чёрный", "Разноцветный",
                   "Другой"]
@@ -14,7 +17,7 @@ class AddData:
         self.root2.title("Укажите данные товара")
         self.canvas = Canvas(self.root2)
         self.canvas.grid(row=0, column=0, columnspan=5, stick="we")
-        self.photo = ImageTk.PhotoImage(Image.open(f'./data_xl/photo/{photo}.jpeg').resize((310, 300)))
+        self.photo = ImageTk.PhotoImage(Image.open(f'./data_xl/photo/{photo}.jpg').resize((310, 300)))
         self.canvas.create_image(0, 0, anchor=NW, image=self.photo)
         self.variables = {
             "closet": {'Material': ["МДФ", "Металл", "Пластик", "ДСП"],
@@ -67,44 +70,17 @@ class AddData:
         else:
             self.root2.destroy()
 
-    def cabinet(self):
-        for i in range(len(self.var)):
-            if not ' | '.join(self.variables[self.var[i]][j] for j in self.lists[i].curselection()):
-                self.data.clear()
-                mb.showerror("Ошибка", """Выберите хотя бы одни эллемент в каждом параметре.""")
-                break
-            self.data.append(' | '.join(self.variables[self.var[i]][j] for j in self.lists[i].curselection()))
-        else:
-            self.root2.destroy()
 
-    def closet(self):
+    def nottables(self):
         for i in range(len(self.var)):
             if not ' | '.join(self.variables[self.var[i]][j] for j in self.lists[i].curselection()):
                 self.data.clear()
+                logger.info("Эллемент не выбран")
                 mb.showerror("Ошибка", """Выберите хотя бы одни эллемент в каждом параметре.""")
                 break
             self.data.append(' | '.join(self.variables[self.var[i]][j] for j in self.lists[i].curselection()))
         else:
-            self.root2.destroy()
-
-    def comp_armchair(self):
-        for i in range(len(self.var)):
-            if not ' | '.join(self.variables[self.var[i]][j] for j in self.lists[i].curselection()):
-                self.data.clear()
-                mb.showerror("Ошибка", """Выберите хотя бы одни эллемент в каждом параметре.""")
-                break
-            self.data.append(' | '.join(self.variables[self.var[i]][j] for j in self.lists[i].curselection()))
-        else:
-            self.root2.destroy()
-
-    def chairs(self):
-        for i in range(len(self.var)):
-            if not ' | '.join(self.variables[self.var[i]][j] for j in self.lists[i].curselection()):
-                self.data.clear()
-                mb.showerror("Ошибка", """Выберите хотя бы одни эллемент в каждом параметре.""")
-                break
-            self.data.append(' | '.join(self.variables[self.var[i]][j] for j in self.lists[i].curselection()))
-        else:
+            logger.info(f"Добавлено {self.data}")
             self.root2.destroy()
 
     def asc(self):
@@ -112,13 +88,18 @@ class AddData:
             self.labels[i].config(text=self.var[i])
             self.labels[i].grid(column=0 + i, row=1)
             self.lists[i].grid(column=0 + i, row=2)
-        but = Button(self.root2, text="Отправить", command=self.__getattribute__(f"{self.table}"), width=20, )
+        but = Button(self.root2, text="Отправить", command=self.tables if self.table == "tables" else self.nottables,
+                     width=20)
         but.grid(column=1, pady=10, stick='w')
 
         self.root2.resizable(False, False)
         self.root2.mainloop()
 
 
+
 if __name__ == "__main__":
-    g = AddData("comp_armchair", "522")
-    print(g.data)
+    g = AddData("tables", "522")
+    b = AddData("cabinet", "522")
+    v = AddData("closet", "522")
+
+    # print(g.data)
