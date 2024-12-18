@@ -1,6 +1,6 @@
 from re import search, findall
 from random import choice
-from UrlPhoto import asc_url
+from YaPhoto import get_url
 from add_data import AddData
 from avitodata import set_id, set_address
 import pandas as pd
@@ -154,6 +154,7 @@ class LoadData:
 
     @classmethod
     def __load_data_xl(cls, name: str) -> None:
+        logger.info("Добавление в таблицу")
         """
             Запускает функцию загрузки данных и добавляет фото в таблицу
             Принимает name - self.choose
@@ -172,26 +173,26 @@ class LoadData:
 
         for i in key:
             title = search(r"(.*)", pars_data[i]).group()
-            art = None
+            art = findall(r"[Аa]рт(?:икул)?[:. (]*([\d]*)", pars_data[i])
+            price = findall(r"Цена[: ]?([\d ]*)", pars_data[i])
 
             try:
-                art = findall(r"[Аa]рт(?:икул)?[:. (]*([\d]*)", pars_data[i])[0]
+                art = int(art[0].replace(' ', ''))
+                price = int(price[0].replace(' ', ''))
             except (IndexError, ValueError):
-                art = 1
+                logger.info(f"Ошибка заполнения данных цены или артикула {title, art}")
+                mb.showerror("Error", f"Проверьте правильность цены или артикула в телеграме {title, art}!")
+                return None
 
             description = pars_data[i] + "\n" + (
                 cls.add_text[name] if name in cls.add_text else cls.add_text['tables']) + "\n" + choice(cls.main_text)
-            price = findall(r"Цена[: ]?([\d ]*)", pars_data[i]) or ["1"]
-            try:
-                price = int(price[0].replace(' ', ''))
-            except (IndexError, ValueError):
-                logger.info(f"Ошибка размеров {title, art}")
-                mb.showerror("Error", f"Проверьте правильность цены в телеграме {title, art}!")
-                return None
 
-            logger.info(f"Добавление товара {title, art}")
-            image_url: str = asc_url(i)
-            logger.info(f"Ввод ссылок {art}: {image_url}")
+            logger.info(f"Добавление ссылок {title, art}")
+            image_url: str = get_url(name, art)
+            if not image_url:
+                logger.info(f"Ссылки не добавлены {title, art}")
+                mb.showerror("Error", f"Проверьте наличие и название ссылок {title, art}!")
+                return None
 
             data_add = None
 
