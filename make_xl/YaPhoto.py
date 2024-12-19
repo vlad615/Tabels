@@ -1,7 +1,7 @@
 import yadisk
 from key import APL_ID, APL_SCR, YA_TOKEN
 from logging import getLogger
-
+from tkinter.messagebox import showerror
 logger = getLogger(__name__)
 
 client = yadisk.Client(id=APL_ID, secret=APL_SCR, token=YA_TOKEN)
@@ -22,14 +22,22 @@ def get_url(folder: str, art: int):
     with client:
         for i in list(client.listdir(path)):
             if not i.public_url:
-                client.publish(path)
+                logger.info(f"publish {i.name}")
+                client.publish(path+"/"+i.name)
+
+        for i in list(client.listdir(path)):
             if i.name.startswith(str(art)):
+                logger.info(f"add {i.public_url}")
                 urls.append(i.public_url)
-    logger.info(f"{len(urls)} ссылок добавлено")
-    return " | ".join(urls)
+    if urls:
+        logger.info(f"{len(urls)} ссылок добавлено")
+        return " | ".join(urls)
+    else:
+        showerror("Ошибка поиска фото", "Проверьте правильно ли добавлены фото в ЯДиск!")
+        get_url(folder, art)
 
 
 if __name__ == "__main__":
-    g = get_url("director office", 121)
+    g = get_url("director office", 222)
     print(g)
     print(len(g))

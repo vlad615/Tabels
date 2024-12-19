@@ -5,6 +5,7 @@ from logging import getLogger
 
 logger = getLogger(__name__)
 
+
 class AddData:
 
     def __init__(self, table: str, photo: str):
@@ -17,13 +18,13 @@ class AddData:
         self.root2.title("Укажите данные товара")
         self.canvas = Canvas(self.root2)
         self.canvas.grid(row=0, column=0, columnspan=5, stick="we")
-        self.photo = ImageTk.PhotoImage(Image.open(f'./data_xl/photo/{photo}.jpg').resize((310, 300)))
+        self.photo = ImageTk.PhotoImage(Image.open(f'./data_xl/photo/{photo}.jpeg').resize((310, 300)))
         self.canvas.create_image(0, 0, anchor=NW, image=self.photo)
         self.variables = {
             "closet": {'Material': ["МДФ", "Металл", "Пластик", "ДСП"],
                        'Purpose': ["Кабинет", "Офис", "Балкон", "Гостиная", "Прихожая", "Спальня"],
                        "Color": colors},
-            "comp_armchair": {'UpholsteryMaterial': ["Искусственная кожа", "Кожа", "Ткань", "Сетка", "Замша", "Дерево"],
+            "comp armchair": {'UpholsteryMaterial': ["Искусственная кожа", "Кожа", "Ткань", "Сетка", "Замша", "Дерево"],
                               'FurnitureAdditions': ["Подлокотники", "Подголовник", "Механизм качания",
                                                      "Регулировка наклона спинки", "Регулировка высоты",
                                                      "Регулировка подлокотников", "Регулировка глубины сиденья",
@@ -48,7 +49,7 @@ class AddData:
         }[table]
         self.var = list(self.variables.keys())
         self.data = []
-        width = 30 if self.table == "comp_armchair" else 17
+        width = 30 if self.table == "comp armchair" else 17
         self.labels = [Label(self.root2) for i in self.var]
         self.lists = [
             Listbox(listvariable=Variable(value=self.variables[i]), width=width, height=len(self.variables[i]),
@@ -69,7 +70,6 @@ class AddData:
             self.data.append(' | '.join(self.variables[self.var[i]][j] for j in self.lists[i].curselection()))
         else:
             self.root2.destroy()
-
 
     def nottables(self):
         for i in range(len(self.var)):
@@ -94,7 +94,6 @@ class AddData:
 
         self.root2.resizable(False, False)
         self.root2.mainloop()
-
 
 
 if __name__ == "__main__":

@@ -31,14 +31,19 @@ class CopyContent:
         await self.__client.start()
         messages: AsyncGenerator[Message, None] = self.__client.get_chat_history(chat_id=donor_channel, limit=lim)
         async for i in messages:
-            print(i)
             cap = i.caption
             iid = i.id
             if cap:
+                art = None
+                try:
+                    art = int(findall(r"[Аa]рт(?:икул)?[:. (]*([\d]*)", cap)[0])
+                except (IndexError, TypeError):
+                    pass
+
                 path = self.__cwd + f'\\data_xl\\photo\\{iid}.jpeg'
                 await self.__client.download_media(message=i, file_name=path)
                 self.data[f"{iid}"] = str(cap)
-                logger.info(f"Добавление товара {cap}")
+                logger.info(f"Добавление товара {art}")
 
         return self.data
 

@@ -11,10 +11,13 @@ from logging import getLogger
 
 logger = getLogger(__name__)
 
+
 class ChangeTabel:
     __cwd = getcwd()
+
     def __init__(self, choose: str = None):
         self.choose = choose
+
     @classmethod
     def __open_xl(cls, name_table: str) -> pd.DataFrame:
         """
@@ -56,6 +59,7 @@ class ChangeTabel:
             start_id += 1
         fr.to_excel(file + ".xlsx", index=False)
 
+
 """
     class LoadData
         Запускает парсер телеграмма и загружает данные в таблицу.
@@ -65,6 +69,7 @@ class ChangeTabel:
             chairs.
         count_mass - количество фото,которое должно войти в парсинг
 """
+
 
 class LoadData:
     __cwd = getcwd()
@@ -204,17 +209,13 @@ class LoadData:
 
             logger.info(f"Добавление ссылок {title, art}")
             image_url: str = get_url(name, art)
-            if not image_url:
-                logger.info(f"Ссылки не добавлены {title, art}")
-                mb.showerror("Error", f"Проверьте наличие и название ссылок {title, art}!")
-                return None
 
             data_add = None
 
             logger.info(f"Добавление размеров и проч. данных {title, art}")
             try:
                 if name in ("straight tables", "corner tables", "director office"):
-                    size = map(int, findall(r'(\d{2,3})[хx/\\](\d{2,3})[хx/\\](\d{2,3})', pars_data[i])[0])
+                    size = map(int, findall(r'(\d{2,3})[хx/\\](\d{2,3})[хx/\\](\d{1,3})', pars_data[i])[0])
                     data_tab = AddData("tables", i)
                     data_add = data_tab.data
                     data_add.extend(size)
@@ -259,7 +260,8 @@ class LoadData:
         alls = False
         dont_del = []
         tables = {"Кресла": "comp armchair.xlsx", "КАБИНЕТЫ ДИРЕКТОРА": "director office.xlsx",
-                  "СТОЛЫ ПРЯМЫЕ": "straight tables.xlsx", "СТОЛЫ УГЛОВЫЕ": "corner tables.xlsx", "СТУЛЬЯ": "chairs.xlsx"}
+                  "СТОЛЫ ПРЯМЫЕ": "straight tables.xlsx", "СТОЛЫ УГЛОВЫЕ": "corner tables.xlsx",
+                  "СТУЛЬЯ": "chairs.xlsx"}
         pars_data = cls.__read_js()
         for key, val in pars_data.items():
             logger.info(f"Удаление из {key}")
