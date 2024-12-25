@@ -33,17 +33,16 @@ class ChangeTabel:
         """
         df = pd.DataFrame()
         if name_table in ("straight tables", "corner tables", "director office"):
-            xl = pd.read_excel(f"{cls.__cwd}/data_xl/straight tables.xlsx")[1:]
-            xl1 = pd.read_excel(f"{cls.__cwd}/data_xl/corner tables.xlsx")[1:]
-            xl2 = pd.read_excel(f"{cls.__cwd}/data_xl/director office.xlsx")[1:]
+            xl = pd.read_excel(f"{cls.__cwd}/data_xl/straight tables.xlsx")
+            xl1 = pd.read_excel(f"{cls.__cwd}/data_xl/corner tables.xlsx")
+            xl2 = pd.read_excel(f"{cls.__cwd}/data_xl/director office.xlsx")
 
             df = pd.concat([xl, xl1, xl2])
             df = df.reset_index()
             del df['index']
 
         else:
-            xl = pd.read_excel(f"{cls.__cwd}/data_xl/{name_table}.xlsx")
-            df = pd.concat([df, xl])
+            df = pd.read_excel(f"{cls.__cwd}/data_xl/{name_table}.xlsx")
 
         return df
 
@@ -184,7 +183,7 @@ class LoadData:
         fr = pd.DataFrame(xl)
         key = list(pars_data.keys())
         field = ['Title', 'Description', 'Price', 'ImageUrls', 'Id', 'VideoURL', 'Category', 'AdType', 'Condition',
-                 'Availability']
+                 'Availability', 'CanBeDisassembled']
         field.extend(cls._tables_field[name][0])
         if name in ("straight tables", "corner tables", "director office"):
             field.extend(['Length', 'Width', 'Height'])
@@ -235,7 +234,7 @@ class LoadData:
             logger.info(f"Добавление в таблицу {title} Цена {price}, Артикул {art}")
             lst = [title, description, price, image_url, art,
                    'https://youtu.be/ycYx204IpKc?si=5z8-v1fOQP2SdfR_', 'Мебель и интерьер',
-                   'Товар приобретен на продажу', 'Б/у', 'В наличии']
+                   'Товар приобретен на продажу', 'Б/у', 'В наличии', "Нет"]
 
             lst.extend(cls._tables_field[name][1])
             lst.extend(data_add)

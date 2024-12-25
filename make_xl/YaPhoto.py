@@ -28,7 +28,7 @@ def get_url(folder: str, art: int):
         for i in list(client.listdir(path)):
             if i.name.startswith(str(art)):
                 logger.info(f"add {i.public_url}")
-                urls.append(i.public_url)
+                urls.append("https://disk.yandex.ru/i/" + i.public_url[-14:])
     if urls:
         logger.info(f"{len(urls)} ссылок добавлено")
         return " | ".join(urls)
@@ -38,6 +38,5 @@ def get_url(folder: str, art: int):
 
 
 if __name__ == "__main__":
-    g = get_url("director office", 222)
+    g = get_url("corner tables", 2427)
     print(g)
-    print(len(g))
