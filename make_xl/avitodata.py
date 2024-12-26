@@ -4,13 +4,8 @@ from tkinter import filedialog
 
 def set_id(count_id: int) -> list[int]:
     start_id = randint(1_000, 1_000_000)
-    ids = []
 
-    for i in range(count_id):
-        ids.append(start_id)
-        start_id += 1
-
-    return ids
+    return list([i for i in range(start_id, start_id+count_id)])
 
 
 def set_address(cont_id: int) -> tuple[list[str], str]:
