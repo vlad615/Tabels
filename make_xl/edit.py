@@ -11,7 +11,7 @@ for name in tables:
     for i in range(table.index.size):
         desc = table.loc[i, "Description"]
         print(i, len(desc))
-        if re.search(r"\n➕ Наш телеграмм канал – office comfort es", desc):
-            table.loc[i, "Description"] = sub(r"\n➕ Наш телеграмм канал – office comfort es", "", desc)
+        if re.search(r"\n[ ]*➕ Наш телеграмм канал – office comfort es", desc):
+            table.loc[i, "Description"] = sub(r"\n[ ]*➕ Наш телеграмм канал – office comfort es", "", desc)
 
     table.to_excel("data_xl/"+name, index=False)
