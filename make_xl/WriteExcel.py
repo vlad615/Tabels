@@ -195,8 +195,8 @@ class LoadData:
                 art = int(art[0].replace(' ', ''))
                 price = int(price[0].replace(' ', ''))
             except (IndexError, ValueError):
-                logger.info(f"Ошибка заполнения данных цены или артикула {title, art}")
-                mb.showerror("Error", f"Проверьте правильность цены или артикула в телеграме {title, art}!")
+                logger.info(f"Ошибка заполнения данных цены {price} или артикула {art} {title}")
+                mb.showerror("Error", f"Проверьте правильность цены или артикула в телеграме {title}!")
                 return None
 
             description = pars_data[i] + "\n" + (

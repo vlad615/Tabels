@@ -58,6 +58,7 @@ class CopyContent:
                 cap = i.caption
                 if cap:
                     try:
+                        logger.debug(f'{i}===> {cap}')
                         art = findall(r"[Аa]рт(?:икул)?[:. (]*([\d]*)", cap)[0]
                         self.data[title].append(int(art))
                         logger.info(f"Добавление в очередь на удаление {art}")
@@ -70,6 +71,7 @@ class CopyContent:
             Загрузка данных в json file
         """
         with open(f"{self.__cwd}/data_xl/captions.json", "w") as f:
+            logger.debug(self.data)
             dump(self.data, f, ensure_ascii=False, indent=4)
 
 

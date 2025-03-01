@@ -7,7 +7,7 @@ from WriteExcel import LoadData, ChangeTabel
 from tkinter import font
 from tkinter import messagebox as mb
 from functools import wraps
-from logging import getLogger, basicConfig, INFO
+from logging import getLogger, basicConfig, INFO, DEBUG
 
 
 logger = getLogger()
