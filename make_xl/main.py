@@ -35,7 +35,7 @@ def start():
             "Компьютерные кресла": ("comp armchair", -1001198770422),
             "Стулья": ("chairs", -1001430077633),
             "Шкафы": ("closet", -1001390310467),
-            "Тумбы": ("cabinet", -1001216807024),}
+            "Тумбы": ("cabinet", -1001216807024), }
 
     main_menu = tkinter.Menu()
     menu = tkinter.Menu()
