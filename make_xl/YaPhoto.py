@@ -38,5 +38,5 @@ def get_url(folder: str, art: int):
 
 
 if __name__ == "__main__":
-    g = get_url("director office", 233)
+    g = get_url("straight tables", 2493)
     print(g)
