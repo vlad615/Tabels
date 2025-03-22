@@ -45,7 +45,7 @@ def start():
     menu.add_command(label="Заменить таблицу", command=lambda: add_goods(vals[key[listbox.curselection()[0]]],
                                                                        enter_count.get(), root))
     menu.add_separator()
-    menu.add_command(label="Инструкция", command= lambda : add_goods)
+    menu.add_command(label="Инструкция", command=lambda: add_goods)
     main_menu.add_cascade(label="Меню", menu=menu)
     key = list(vals.keys())
     variable = Variable(value=key)
