@@ -15,7 +15,7 @@ paths = {'cabinet': "Тумбы",
          'director office': "Кабинет руководителя"}
 
 
-def get_url(folder: str, art: int):
+def get_url(folder: str, art):
     path = f"/Мебель/{paths[folder]}"
 
     urls = []
@@ -38,5 +38,5 @@ def get_url(folder: str, art: int):
 
 
 if __name__ == "__main__":
-    g = get_url("director office", 248)
+    g = get_url("closet", "БП68222")
     print(g)
