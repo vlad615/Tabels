@@ -38,5 +38,5 @@ def get_url(folder: str, art):
 
 
 if __name__ == "__main__":
-    g = get_url("closet", "БП68222")
+    g = get_url("cabinet", "125702")
     print(g)
