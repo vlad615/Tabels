@@ -38,5 +38,5 @@ def get_url(folder: str, art):
 
 
 if __name__ == "__main__":
-    g = get_url("cabinet", "125702")
+    g = get_url("director office", "280")
     print(g)
