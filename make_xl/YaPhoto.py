@@ -33,9 +33,8 @@ def get_url(folder: str, art):
         logger.info(f"{len(urls)} ссылок добавлено")
         return " | ".join(urls)
     else:
-        showerror("Ошибка поиска фото", "Проверьте правильно ли добавлены фото в ЯДиск!")
-        get_url(folder, art)
-
+        n = input(f"Введите ссылки: ")
+        return n
 
 if __name__ == "__main__":
     g = get_url("director office", "280")
